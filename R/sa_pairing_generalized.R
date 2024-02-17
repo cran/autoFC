@@ -122,7 +122,7 @@
 #' solution <- make_random_block(60, 60, 3)
 #'
 ## Simple simulation of responses from 600 participants on the 60 items.
-## In practice, should use real world data or simluation based on IRT parameters.
+## In practice, should use real world data or simulation based on IRT parameters.
 #'
 #' item_responses <- matrix(sample(seq(1:5), 600*60, replace = TRUE), nrow = 60, byrow = TRUE)
 #'

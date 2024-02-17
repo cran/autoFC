@@ -1,0 +1,19 @@
+#' Example HEXACO Response Data
+#'
+#' Responses to the HEXACO-60 (Ashton & Lee, 2009) scale from 100 actual respondents
+#'
+#' @format A data frame with 100 rows and 60 columns.
+#' \describe{
+#'   \item{SS1, SS2, SS3, SS4, SS5, SS6, SS7, SS8, SS9, SS10,
+#'         SS11, SS12, SS13, SS14, SS15, SS16, SS17, SS18, SS19, SS20,
+#'         SS21, SS22, SS23, SS24, SS25, SS26, SS27, SS28, SS29, SS30,
+#'         SS31, SS32, SS33, SS34, SS35, SS36, SS37, SS38, SS39, SS40,
+#'         SS41, SS42, SS43, SS44, SS45, SS46, SS47, SS48, SS49, SS50,
+#'         SS51, SS52, SS53, SS54, SS55, SS56, SS57, SS58, SS59, SS60}{Represents the 60 HEXACO items.}
+#' }
+#' @source https://osf.io/yvpz3/?view_only=08601755f471440b80973194571b60bd
+#' 
+#' @references 
+#' Ashton, M. C., & Lee, K. (2009). The HEXACO–60: A short measure of the major dimensions of personality. 
+#' \emph{Journal of Personality Assessment, 91}(4), 340-345. https://doi.org/10.1080/00223890902935878
+"HEXACO_example_data"

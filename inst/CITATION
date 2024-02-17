@@ -1,0 +1,26 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "autoFC: An R Package for Automatic Item Pairing in Forced-Choice Test Construction",
+  author   = c(person("Mengtong", "Li"),
+               person("Tianjun", "Sun"),
+               person("Bo", "Zhang")),
+  journal  = "Applied Psychological Measurement",
+  year     = "2022",
+  volume   = "46",
+  number   = "1",
+  pages    = "70-72",
+  doi      = "10.1177/01466216211051726"
+)
+
+bibentry(
+  bibtype  = "Article",
+  title    = "Mixed-Keying or Desirability-Matching in the Construction of Forced-Choice Measures? An Empirical Investigation and Practical Recommendations",
+  author   = c(person("Mengtong", "Li"),
+               person("Bo", "Zhang"),
+               person("Lingyue", "Li"),
+               person("Tianjun", "Sun"),
+               person("Anna", "Brown")),
+  journal  = "Organizational Research Methods",
+  year     = "2024",
+  doi      = "10.1177/10944281241229784"
+)
