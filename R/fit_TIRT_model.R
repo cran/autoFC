@@ -79,7 +79,7 @@
 #'
 #' @export
 #'
-
+library(tidyr)
 
 fit_TIRT_model <- function(data_TIRT, method = "lavaan", lavaan_estimator = "WLSMV", 
                            stan_cores = 4, chains = 4, iter = 2000, verbose = TRUE, remove_mplus_file = FALSE,
@@ -98,7 +98,7 @@ fit_TIRT_model <- function(data_TIRT, method = "lavaan", lavaan_estimator = "WLS
     traits_TIRT <- predict(fit_TIRT, newdata = data_TIRT)           
   }
   else if (method == "stan") {
-    fit_TIRT <- fit_TIRT_stan(data_TIRT, cores = stan_cores, chains = chains) 
+    fit_TIRT <- fit_TIRT_stan(data_TIRT, cores = stan_cores, chains = chains, iter = iter) 
     traits_TIRT  <- predict(fit_TIRT, newdata = data_TIRT, core = stan_cores, chains = chains, iter = iter) 
   }
   else {

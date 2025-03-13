@@ -1,7 +1,7 @@
 Type: Package
 Package: autoFC
 Title: Automatic Construction of Forced-Choice Tests
-Version: 0.2.0.1001
+Version: 0.2.0.1002
 Authors@R: c(
     person("Mengtong", "Li", , "ml70@illinois.edu", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0002-1766-4976")),
@@ -52,10 +52,10 @@ Imports: dplyr, irrCAC, lavaan, MASS, SimDesign, thurstonianIRT,
         MplusAutomation, glue, tidyr
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
-Date/Publication: 2024-02-17 10:50:12 UTC
+Date/Publication: 2025-03-13 16:00:01 UTC
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2024-02-17 06:10:45 UTC; LENOVO
+Packaged: 2025-03-12 17:23:50 UTC; Mengtong Li
 Repository: CRAN
 RoxygenNote: 7.2.3
 Depends: R (>= 2.10)

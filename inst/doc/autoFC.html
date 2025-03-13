@@ -50,7 +50,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -61,7 +61,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -476,33 +476,33 @@ arguments.</p></li>
 Big Five traits, each with a certain item location, are used to build a
 FC scale with block size 3. We also simulate responses from 1,000
 participants for the 60 items on their social desirability.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2021</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulation of 1,000 respondents on 60 items. A better simulation should be</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># consisting of responses produced by specific IRT parameters.</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="dv">500</span><span class="sc">*</span><span class="dv">60</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span>, <span class="fl">0.30</span>))</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="dv">500</span><span class="sc">*</span><span class="dv">60</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                                <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.50</span>, <span class="fl">0.10</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>))</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>item_responses <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(s1, s2), <span class="at">ncol =</span> <span class="dv">60</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>item_dims <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;Openness&quot;</span>,<span class="st">&quot;Conscientiousness&quot;</span>,<span class="st">&quot;Neuroticism&quot;</span>,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;Extraversion&quot;</span>,<span class="st">&quot;Agreeableness&quot;</span>), <span class="dv">60</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>item_mean <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(item_responses)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>item_difficulty <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">60</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Then we build a data frame with item characteristics</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>item_chars <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">DIM =</span> item_dims, <span class="at">SD_Mean =</span> item_mean, <span class="at">DIFF =</span> item_difficulty)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>char_weights <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2021</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># Simulation of 1,000 respondents on 60 items. A better simulation should be</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># consisting of responses produced by specific IRT parameters.</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>s1 <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="dv">500</span><span class="sc">*</span><span class="dv">60</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>                                <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.20</span>, <span class="fl">0.25</span>, <span class="fl">0.30</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>), <span class="dv">500</span><span class="sc">*</span><span class="dv">60</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>                                <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.50</span>, <span class="fl">0.10</span>, <span class="fl">0.10</span>, <span class="fl">0.15</span>, <span class="fl">0.15</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>item_responses <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(s1, s2), <span class="at">ncol =</span> <span class="dv">60</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>item_dims <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;Openness&quot;</span>,<span class="st">&quot;Conscientiousness&quot;</span>,<span class="st">&quot;Neuroticism&quot;</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>                      <span class="st">&quot;Extraversion&quot;</span>,<span class="st">&quot;Agreeableness&quot;</span>), <span class="dv">60</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>item_mean <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(item_responses)</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>item_difficulty <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">60</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co"># Then we build a data frame with item characteristics</span></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>item_chars <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">DIM =</span> item_dims, <span class="at">SD_Mean =</span> item_mean, <span class="at">DIFF =</span> item_difficulty)</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>char_weights <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>)</span></code></pre></div>
 </div>
 <div id="step-2-construct-an-initial-solution" class="section level3">
 <h3>Step 2: Construct an initial solution</h3>
 <p>Next, we build a random FC scale using the 60 items with block size
 3. You can see from <code>initial_FC</code> that now all 60 items are
 divided into 20 triplets.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>initial_FC <span class="ot">&lt;-</span> <span class="fu">make_random_block</span>(<span class="at">total_items =</span> <span class="dv">60</span>, <span class="at">item_per_block =</span> <span class="dv">3</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(initial_FC)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>initial_FC <span class="ot">&lt;-</span> <span class="fu">make_random_block</span>(<span class="at">total_items =</span> <span class="dv">60</span>, <span class="at">item_per_block =</span> <span class="dv">3</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(initial_FC)</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -612,7 +612,7 @@ the 20 triplets.</p>
 <p>First, the underlying latent traits. We see that there are some cases
 where two items measuring the same traits appear in the same block,
 which is something we want to avoid.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -720,8 +720,8 @@ which is something we want to avoid.</p>
 <p>Then, scores on social desirability. We do see many cases where items
 differ in their social desirability on a magnitude of &gt;1 on a 5-point
 scale, within a block. That’s not good.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>sd_initial <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_initial)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>sd_initial <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_initial)</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -828,8 +828,8 @@ scale, within a block. That’s not good.</p>
 </table>
 <p>Lastly, item difficulty. We also see that item difficulties within a
 block are also inconsistent.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>diff_initial <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIFF[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_initial)</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>diff_initial <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIFF[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_initial)</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -947,29 +947,29 @@ block.</p>
 range than social desirability. Beware about the scaling difference
 among different item characteristics and use different weights
 accordingly.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cal_block_energy</span>(<span class="at">block =</span> initial_FC, <span class="at">item_chars =</span> item_chars, <span class="at">weights =</span> char_weights)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -25.28441</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">cal_block_energy</span>(<span class="at">block =</span> initial_FC, <span class="at">item_chars =</span> item_chars, <span class="at">weights =</span> char_weights)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt; [1] -25.28441</span></span></code></pre></div>
 <p>If IIAs are to be involved we have lower energy value. This is
 because these randomly generated responses are not likely to be
 consistent with each other, hence very low and even negative IIAs:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">item_chars =</span> item_chars, </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">rater_chars =</span> item_responses)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           [,1]</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] -33.31589</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">item_chars =</span> item_chars, </span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                          <span class="at">rater_chars =</span> item_responses)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt;           [,1]</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; [1,] -33.31589</span></span></code></pre></div>
 <p>Notice that if we give zero weights to all IIAs we will get the same
 energy value as <code>cal_block_energy</code>:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">item_chars =</span> item_chars, </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">rater_chars =</span> item_responses, </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">iia_weights =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           [,1]</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] -25.28441</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">item_chars =</span> item_chars, </span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>                          <span class="at">rater_chars =</span> item_responses, </span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>                          <span class="at">iia_weights =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt;           [,1]</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1,] -25.28441</span></span></code></pre></div>
 <p>Also, if you want to see the inter-item agreement metrics for each
 block, you can use <code>get_iia()</code>. It should not be too
 impressive and is for demonstration purposes only. Users are suggested
 to use real world response data to see the IIA within each block.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">get_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">data =</span> item_responses))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">get_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">data =</span> item_responses))</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1175,15 +1175,15 @@ number of participants.</p>
 given for the 4 IIA metrics, including linearly and quadratically
 weighted AC (Gwet, 2008; 2014) and Brennan-Prediger Index (Prennan &amp;
 Prediger, 1981; Gwet, 2014). Default to a vector of all 1s.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Note that this will take some time to run! (~ 1-2 minutes with this setting)</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Weights for social desirability score and item difficulty should be set to -1, </span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># because we don&#39;t want variance for these characteristics to be big.</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(<span class="at">block =</span> initial_FC, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">weights =</span> char_weights,</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Note that this will take some time to run! (~ 1-2 minutes with this setting)</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co"># Weights for social desirability score and item difficulty should be set to -1, </span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co"># because we don&#39;t want variance for these characteristics to be big.</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(<span class="at">block =</span> initial_FC, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>                                 <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>                                 <span class="at">weights =</span> char_weights,</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>                                 <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>                                 <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
 </div>
 </div>
 <div id="step-5-see-how-this-improves-over-the-initial-one" class="section level3">
@@ -1193,25 +1193,25 @@ solution!</p>
 <p>Let’s first see the total energy compared to the previous one. First
 are the initial energy, which is identical to what we have calculated in
 Step 4.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial energy with IIA</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> result<span class="sc">$</span>block_initial, <span class="at">item_chars =</span> item_chars, </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights, <span class="at">rater_chars =</span> item_responses)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           [,1]</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] -33.31589</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative way to calculate initial energy</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(result<span class="sc">$</span>energy_initial)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -33.31589</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Initial energy with IIA</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> result<span class="sc">$</span>block_initial, <span class="at">item_chars =</span> item_chars, </span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights, <span class="at">rater_chars =</span> item_responses)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt;           [,1]</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; [1,] -33.31589</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co"># Alternative way to calculate initial energy</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="fu">print</span>(result<span class="sc">$</span>energy_initial)</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; [1] -33.31589</span></span></code></pre></div>
 <p>And the final result:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Final energy with IIA</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> result<span class="sc">$</span>block_final, <span class="at">item_chars =</span> item_chars, </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights, <span class="at">rater_chars =</span> item_responses)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          [,1]</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,] 21.69018</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Alternative way to calculate final energy</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(result<span class="sc">$</span>energy_final)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 21.69018</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Final energy with IIA</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">cal_block_energy_with_iia</span>(<span class="at">block =</span> result<span class="sc">$</span>block_final, <span class="at">item_chars =</span> item_chars, </span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>                          <span class="at">weights =</span> char_weights, <span class="at">rater_chars =</span> item_responses)</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt;          [,1]</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; [1,] 21.69018</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co"># Alternative way to calculate final energy</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="fu">print</span>(result<span class="sc">$</span>energy_final)</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; [1] 21.69018</span></span></code></pre></div>
 <p>Let’s take a look at how items are matched within each block. First
 are underlying latent traits.</p>
 <p>This time, within each block, the three items are already coming from
@@ -1220,7 +1220,7 @@ three distinct latent traits!</p>
 different latent traits after pairing. But if you want to increase the
 likelihood for such a result, you can increase the weight corresponding
 to item dimension)</strong></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1329,8 +1329,8 @@ to item dimension)</strong></p>
 block. Item social desirability scores are much closer to each other
 within each block, but we see that there are still big discrepancies two
 blocks.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>sd_final <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_final)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>sd_final <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_final)</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1438,18 +1438,18 @@ blocks.</p>
 <p>A more intuitive way to present this: how much have we improved on
 the average variance for all blocks? Still, it is much lower, but we see
 there is always space to improve.</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_initial, <span class="dv">1</span>, var)))   </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.3317092</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Final</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_final, <span class="dv">1</span>, var)))     </span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.04195382</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Initial</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_initial, <span class="dv">1</span>, var)))   </span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; [1] 0.3317092</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co"># Final</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_final, <span class="dv">1</span>, var)))     </span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co">#&gt; [1] 0.04195382</span></span></code></pre></div>
 <p>Finally we look at item difficulty. Good improvement is also
 observed. We see that difference in item difficulty within a block also
 decreases:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>diff_final <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIF[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>diff_final <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIF[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1556,15 +1556,15 @@ decreases:</p>
 </table>
 <p>How much have we improved on the average variance for all blocks in
 this case?</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_initial, <span class="dv">1</span>, var)))   </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.4275037</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_final, <span class="dv">1</span>, var)))     </span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.04305659</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_initial, <span class="dv">1</span>, var)))   </span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="co">#&gt; [1] 0.4275037</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_final, <span class="dv">1</span>, var)))     </span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="co">#&gt; [1] 0.04305659</span></span></code></pre></div>
 <p>We also list IIAs for demonstration purposes, which also
 improves.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colMeans</span>(<span class="fu">get_iia</span>(result<span class="sc">$</span>block_final, <span class="at">data =</span> item_responses))</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      BPlin     BPquad      AClin     ACquad </span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  0.0195425 -0.0498910  0.1263995  0.1595815</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">colMeans</span>(<span class="fu">get_iia</span>(result<span class="sc">$</span>block_final, <span class="at">data =</span> item_responses))</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt;      BPlin     BPquad      AClin     ACquad </span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co">#&gt;  0.0195425 -0.0498910  0.1263995  0.1595815</span></span></code></pre></div>
 </div>
 <div id="step-6-automatic-pairing-with-a-multi-step-optimization-process" class="section level3">
 <h3>Step 6: Automatic pairing with a multi-step optimization
@@ -1591,31 +1591,31 @@ if they are not yet optimized.</p></li>
 <p>With the previous example, we show how method 2 will work, starting
 from <code>initial_FC</code>. First we perform optimization on latent
 traits:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>FC_1 <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(initial_FC, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">weights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>FC_1 <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(initial_FC, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>                                 <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>                                 <span class="at">weights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>),</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>                                 <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>                                 <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
 <p>Then, we optimize based on minimizing variance in social desirability
 within a block.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>FC_2 <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(FC_1<span class="sc">$</span>block_final, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">weights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>),</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>FC_2 <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(FC_1<span class="sc">$</span>block_final, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>                               <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>                               <span class="at">weights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>                               <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>                               <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
 <p>Finally, we optimize bease on minimizing variance in item
 difficulty.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>FC_3 <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(FC_2<span class="sc">$</span>block_final, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">weights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>),</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>FC_3 <span class="ot">&lt;-</span> <span class="fu">sa_pairing_generalized</span>(FC_2<span class="sc">$</span>block_final, <span class="at">eta_Temperature =</span> <span class="fl">0.01</span>,</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>                               <span class="at">r =</span> <span class="fl">0.995</span>, <span class="at">end_criteria =</span> <span class="dv">10</span><span class="sc">^</span>(<span class="sc">-</span><span class="dv">6</span>), </span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>                               <span class="at">weights =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>                               <span class="at">item_chars =</span> item_chars, <span class="at">use_IIA =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>                               <span class="at">rater_chars =</span> item_responses)</span></code></pre></div>
 </div>
 <div id="step-7-see-how-a-multi-step-iteration-improves" class="section level3">
 <h3>Step 7: See how a multi-step iteration improves</h3>
 <p>First, underlying latent traits. It does look nice like what we have
 in Step 5.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1723,8 +1723,8 @@ in Step 5.</p>
 <p>Next let’s look at difference in social desirability within each
 block. It performs better than in Step 5, where the discrepancy within
 block is removed!</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sd_FC3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_FC3)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>sd_FC3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_FC3)</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1832,20 +1832,20 @@ block is removed!</p>
 <p>As before, let’s see how much have we improved on the average
 variance for all blocks. Improvement in social desirability is verified
 by seeing the decrease in variance.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial solution</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_initial, <span class="dv">1</span>, var)))   </span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.3317092</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Simultaneous optimization</span></span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_final, <span class="dv">1</span>, var)))    </span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.04195382</span></span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sequential optimization</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_FC3, <span class="dv">1</span>, var)))       </span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.002573133</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># Initial solution</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_initial, <span class="dv">1</span>, var)))   </span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="co">#&gt; [1] 0.3317092</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co"># Simultaneous optimization</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_final, <span class="dv">1</span>, var)))    </span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a><span class="co">#&gt; [1] 0.04195382</span></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="co"># Sequential optimization</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(sd_FC3, <span class="dv">1</span>, var)))       </span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a><span class="co">#&gt; [1] 0.002573133</span></span></code></pre></div>
 <p>Finally we look at item difficulty.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>diff_fc3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIF[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>diff_fc3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIF[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1951,21 +1951,21 @@ by seeing the decrease in variance.</p>
 </tbody>
 </table>
 <p>Average variance of item difficulty also decreases!</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Initial solution</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_initial, <span class="dv">1</span>, var))) </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.4275037</span></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Simultaneous optimization</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_final, <span class="dv">1</span>, var)))   </span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.04305659</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Sequential optimization</span></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_fc3, <span class="dv">1</span>, var)))      </span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.04012038</span></span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co"># Initial solution</span></span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_initial, <span class="dv">1</span>, var))) </span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a><span class="co">#&gt; [1] 0.4275037</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a><span class="co"># Simultaneous optimization</span></span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_final, <span class="dv">1</span>, var)))   </span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="co">#&gt; [1] 0.04305659</span></span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a><span class="co"># Sequential optimization</span></span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">mean</span>(<span class="fu">apply</span>(diff_fc3, <span class="dv">1</span>, var)))      </span>
+<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a><span class="co">#&gt; [1] 0.04012038</span></span></code></pre></div>
 <p>How about IIAs?</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colMeans</span>(<span class="fu">get_iia</span>(FC_3<span class="sc">$</span>block_final, <span class="at">data =</span> item_responses))</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      BPlin     BPquad      AClin     ACquad </span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  0.0335635 -0.0304330  0.1459820  0.1892760</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">colMeans</span>(<span class="fu">get_iia</span>(FC_3<span class="sc">$</span>block_final, <span class="at">data =</span> item_responses))</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt;      BPlin     BPquad      AClin     ACquad </span></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt;  0.0335635 -0.0304330  0.1459820  0.1892760</span></span></code></pre></div>
 </div>
 </div>
 <div id="conclusion" class="section level2">

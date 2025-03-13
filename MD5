@@ -1,4 +1,4 @@
-8674363c05c91029cdfbe56772ea3fe4 *DESCRIPTION
+d0c86ff6feacfdf1de5db8dc35ba40c0 *DESCRIPTION
 8fe38886ab2e707517d422cbd6ffe43a *NAMESPACE
 6caa33ef49691694502fc6812933032b *R/HEXACO_example_data.R
 1d18b1e33b0f55eeb7388b2ca6ebea9c *R/RMSE_range.R
@@ -10,7 +10,7 @@ e26000698830db91a5716bea86a4b751 *R/construct_blueprint.R
 a8f207d86dcbfb1330ed0174e0f21dad *R/convert_to_TIRT_response.R
 5c0de68e789ffc6005f4badea3f44780 *R/empirical_reliability.R
 4b4324f779bdf9cfa98ad4201e106be9 *R/facfun.R
-c593679dde8680357824ffdb5010acc9 *R/fit_TIRT_model.R
+22681b50c3a89551934be4a74d666e80 *R/fit_TIRT_model.R
 0d8ae46c0c847543bdfca6c2cee801ee *R/fit_TIRT_mplus_new.R
 e6d44d6790aeea858ce67e905463431e *R/get_CFA_estimates.R
 b06eed31f482cdc4ef19b2dd24248e1e *R/get_TIRT_long_data.R
@@ -20,18 +20,18 @@ b06eed31f482cdc4ef19b2dd24248e1e *R/get_TIRT_long_data.R
 43c14ba0a580c73b841fe1873c5801fb *R/make_random_block.R
 194c23b07be13e8cfa9244cd888c3b24 *R/plot_scores.R
 ec71370521ec08d5dc57d4dbd05e73bd *R/predict_scores.R
-66a8b059952a02a0d4cae355f830c44d *R/sa_pairing_generalized.R
+7aa16da70af2541ce9dca62dafa6e999 *R/sa_pairing_generalized.R
 ffe5decdf7a3e88a58ff11cd0c014c82 *R/triplet_block_info.R
 9ecdae41a8c9b06c9bc1f24cd33fb907 *R/triplet_example_data.R
 ed2b830925c8fe4a497de74217ce2f9b *README.md
-a638133e70fa27b16922579edf6998eb *build/vignette.rds
+e8bcee89ff3ce7587f00011a666860ac *build/vignette.rds
 17de4830ca17e339099747d90ecae76b *data/HEXACO_example_data.rda
 f5a52be024e8f443f9c283765bd66ffc *data/triplet_block_info.rda
 221a768acf9fe26b4c8c626df0ef2210 *data/triplet_example_data.rda
 6f45ef09b36aa71c3f2caa60db6385fd *inst/CITATION
-e0265abff58ff17a1dfd9ed73031356c *inst/doc/autoFC.R
+245d87d50597e79e403d42d1dae982dc *inst/doc/autoFC.R
 c56e49f9e953c8fd7872717d2df10351 *inst/doc/autoFC.Rmd
-c164d5ead2331b6c776efeb7fa3a4672 *inst/doc/autoFC.html
+01eb8a1bb9f4a651888fb7a13b4714f4 *inst/doc/autoFC.html
 27b7567180550c5ee26522fb9c3277b8 *man/HEXACO_example_data.Rd
 41b8cfa6ea0b0f1908af905da826be87 *man/RMSE_range.Rd
 d15d98a126c74a176ccc1695d8cc9422 *man/build_TIRT_var_names.Rd
