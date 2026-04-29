@@ -89,6 +89,7 @@ cal_block_energy_with_iia(solution, item_chars = item_df, weights = c(1,1,1),
                           FUN = c("facfun", "var", "var"),
                           rater_chars = item_responses, iia_weights = c(1,1,1,1))
 
+
 }
 \references{
 Brennan, R. L., & Prediger, D. J. (1981). Coefficient kappa: Some uses, misuses,

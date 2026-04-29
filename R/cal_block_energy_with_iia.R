@@ -101,7 +101,6 @@
 #'                           FUN = c("facfun", "var", "var"),
 #'                           rater_chars = item_responses, iia_weights = c(1,1,1,1))
 #'
-#' @importFrom irrCAC bp.coeff.raw gwet.ac1.raw
 #'
 #' @export
 

@@ -168,7 +168,6 @@
 #' @note Use \code{cal_block_energy_with_iia} if inter-item agreement
 #' (IIA) metrics are needed.
 #'
-#' @importFrom irrCAC bp.coeff.raw gwet.ac1.raw
 #' @importFrom stats runif
 #'
 #' @export

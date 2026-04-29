@@ -57,7 +57,6 @@
 #' @import MplusAutomation
 #' @import glue
 #' @importFrom dplyr %>%
-#' @importFrom tidyr pivot_wider
 #' @importFrom utils write.csv
 #' 
 #' @author Mengtong Li
@@ -76,10 +75,9 @@
 #'     test_fit$fit_object
 #'     test_fit$final_estimates
 #' }
-#'
 #' @export
 #'
-library(tidyr)
+
 
 fit_TIRT_model <- function(data_TIRT, method = "lavaan", lavaan_estimator = "WLSMV", 
                            stan_cores = 4, chains = 4, iter = 2000, verbose = TRUE, remove_mplus_file = FALSE,
@@ -107,11 +105,11 @@ fit_TIRT_model <- function(data_TIRT, method = "lavaan", lavaan_estimator = "WLS
   
   print(traits_TIRT)
   if (method == "lavaan") {
-    traits_TIRT_s <- traits_TIRT %>% pivot_wider(id_cols = .data$id, names_from = .data$trait,
+    traits_TIRT_s <- traits_TIRT %>% tidyr::pivot_wider(id_cols = .data$id, names_from = .data$trait,
                                                  values_from = c(.data$estimate))
   }
   else {
-    traits_TIRT_s <- traits_TIRT %>% pivot_wider(id_cols = .data$id, names_from = .data$trait,
+    traits_TIRT_s <- traits_TIRT %>% tidyr::pivot_wider(id_cols = .data$id, names_from = .data$trait,
                                                  values_from = c(.data$estimate, .data$se))        
   }
   

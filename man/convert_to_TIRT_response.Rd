@@ -94,17 +94,17 @@ FC_resp <- convert_to_TIRT_response(Utility = cfa_matrices$Utility,
                                     block_design = make_random_block(60, 60, 3),
                                     N_response = 100, format = "pairwise",
                                     block_size = 3, N_blocks = 20)
+# Other examples
 FC_rank_resp <- convert_to_TIRT_response(Utility = cfa_matrices$Utility,
-                                         block_design = make_random_block(60, 60, 5),
-                                         N_response = 100, format = "ranks",
-                                         block_size = 5, N_blocks = 12) 
+                                        block_design = make_random_block(60, 60, 5),
+                                        N_response = 100, format = "ranks",
+                                        block_size = 5, N_blocks = 12) 
 FC_rank_partial_resp <- convert_to_TIRT_response(Utility = cfa_matrices$Utility,
                                                  block_design = make_random_block(60, 60, 5),
-                                                 N_response = 100, format = "ranks", partial = TRUE,
-                                                 block_size = 5, N_blocks = 12)                                          
+                                                 N_response = 100, format = "ranks", 
+                                                 partial = TRUE, block_size = 5, 
+                                                 N_blocks = 12)
 FC_resp
-FC_rank_resp
-FC_rank_partial_resp
 
 }
 \author{

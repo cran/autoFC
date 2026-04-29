@@ -49,8 +49,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -61,7 +62,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -502,7 +503,13 @@ participants for the 60 items on their social desirability.</p>
 3. You can see from <code>initial_FC</code> that now all 60 items are
 divided into 20 triplets.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>initial_FC <span class="ot">&lt;-</span> <span class="fu">make_random_block</span>(<span class="at">total_items =</span> <span class="dv">60</span>, <span class="at">item_per_block =</span> <span class="dv">3</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(initial_FC)</span></code></pre></div>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(initial_FC)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -612,7 +619,13 @@ the 20 triplets.</p>
 <p>First, the underlying latent traits. We see that there are some cases
 where two items measuring the same traits appear in the same block,
 which is something we want to avoid.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -721,7 +734,13 @@ which is something we want to avoid.</p>
 differ in their social desirability on a magnitude of &gt;1 on a 5-point
 scale, within a block. That’s not good.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>sd_initial <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_initial)</span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_initial)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -829,7 +848,13 @@ scale, within a block. That’s not good.</p>
 <p>Lastly, item difficulty. We also see that item difficulties within a
 block are also inconsistent.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>diff_initial <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIFF[<span class="fu">t</span>(initial_FC)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_initial)</span></code></pre></div>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_initial)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -969,7 +994,13 @@ energy value as <code>cal_block_energy</code>:</p>
 block, you can use <code>get_iia()</code>. It should not be too
 impressive and is for demonstration purposes only. Users are suggested
 to use real world response data to see the IIA within each block.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">get_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">data =</span> item_responses))</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">get_iia</span>(<span class="at">block =</span> initial_FC, <span class="at">data =</span> item_responses))</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -1220,7 +1251,13 @@ three distinct latent traits!</p>
 different latent traits after pairing. But if you want to increase the
 likelihood for such a result, you can increase the weight corresponding
 to item dimension)</strong></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1330,7 +1367,13 @@ block. Item social desirability scores are much closer to each other
 within each block, but we see that there are still big discrepancies two
 blocks.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>sd_final <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_final)</span></code></pre></div>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_final)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1449,7 +1492,13 @@ there is always space to improve.</p>
 observed. We see that difference in item difficulty within a block also
 decreases:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>diff_final <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIF[<span class="fu">t</span>(result<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span></code></pre></div>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1615,7 +1664,13 @@ difficulty.</p>
 <h3>Step 7: See how a multi-step iteration improves</h3>
 <p>First, underlying latent traits. It does look nice like what we have
 in Step 5.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIM[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1724,7 +1779,13 @@ in Step 5.</p>
 block. It performs better than in Step 5, where the discrepancy within
 block is removed!</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>sd_FC3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>SD_Mean[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_FC3)</span></code></pre></div>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(sd_FC3)</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">
@@ -1845,7 +1906,13 @@ by seeing the decrease in variance.</p>
 <span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a><span class="co">#&gt; [1] 0.002573133</span></span></code></pre></div>
 <p>Finally we look at item difficulty.</p>
 <div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>diff_fc3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(item_chars<span class="sc">$</span>DIF[<span class="fu">t</span>(FC_3<span class="sc">$</span>block_final)], <span class="at">ncol =</span> <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span></code></pre></div>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(diff_final)</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;align&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; Warning in attr(x, &quot;format&quot;): &#39;xfun::attr()&#39; is deprecated.</span></span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a><span class="co">#&gt; Use &#39;xfun::attr2()&#39; instead.</span></span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="co">#&gt; See help(&quot;Deprecated&quot;)</span></span></code></pre></div>
 <table>
 <tbody>
 <tr class="odd">

@@ -20,7 +20,6 @@
 #'   item_responses <- matrix(sample(seq(1:5), 600*60, replace = TRUE), ncol = 60, byrow = TRUE)
 #'   get_iia(matrix(seq(1:60), ncol = 3, byrow = TRUE), item_responses)
 #'
-#' @importFrom irrCAC bp.coeff.raw gwet.ac1.raw
 #' @export
 
 

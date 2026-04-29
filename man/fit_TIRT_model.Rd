@@ -75,7 +75,6 @@ test_data_long <- get_TIRT_long_data(block_info = triplet_block_info, response_d
     test_fit$fit_object
     test_fit$final_estimates
 }
-
 }
 \references{
 Bürkner, P. C. (2019). thurstonianIRT: Thurstonian IRT models in R. \emph{Journal of Open Source Software, 4}(42), 1662. https://doi.org/10.21105/joss.01662
