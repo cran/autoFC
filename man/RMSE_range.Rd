@@ -2,33 +2,36 @@
 % Please edit documentation in R/RMSE_range.R
 \name{RMSE_range}
 \alias{RMSE_range}
-\title{Calculate the Overall RMSE of the Trait Scores, or the RMSE in a Certain Trait Score Range}
+\title{Calculate Overall or Binned RMSE of Trait Scores}
 \usage{
-RMSE_range(true_scores, estimated_scores, range_breaks = NA)
+RMSE_range(true_scores, estimated_scores, range_breaks = NULL)
 }
 \arguments{
-\item{true_scores}{Actual trait scores}
+\item{true_scores}{Numeric vector. Actual/known trait scores.}
 
-\item{estimated_scores}{Estimated trait scores from a specified model}
+\item{estimated_scores}{Numeric vector. Estimated trait scores from the model.}
 
-\item{range_breaks}{A numeric vector. Specifies which trait scores ranges will the RMSE be calculated}
+\item{range_breaks}{Numeric vector. Optional. Specifies the cut points for the trait
+score bins (e.g., \code{c(-3, -1, 1, 3)}). If \code{NULL}, calculates overall RMSE.}
 }
 \value{
-If \code{range_breaks} is not specified, an overall RMSE numeric value will be returned;
-else, a named list showing the RMSE in each score range will be returned.
+If \code{range_breaks} is \code{NULL}, returns a single numeric RMSE value.
+If \code{range_breaks} is specified, returns a named numeric vector showing
+the RMSE within each score bin.
 }
 \description{
-This function is also for diagnostic purposes, examining which interval on the
-latent trait continuum does the FC scale demonstrate the best measurement accuracy.
-}
-\details{
-TO BE DONE
+A diagnostic function to examine measurement accuracy. It calculates
+the Root Mean Square Error (RMSE) either overall, or within specific intervals
+on the latent trait continuum.
 }
 \examples{
-RMSE_range(rnorm(100), rnorm(100))
-RMSE_range(rnorm(100), rnorm(100), range_breaks = c(-3, -2, -1, 0, 1, 2, 3))
+true <- rnorm(100)
+est <- true + rnorm(100, 0, 0.3)
 
-}
-\author{
-Mengtong Li
+# Overall RMSE
+RMSE_range(true, est)
+
+# Binned RMSE
+RMSE_range(true, est, range_breaks = c(-3, -1, 1, 3))
+
 }

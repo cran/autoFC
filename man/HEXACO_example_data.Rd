@@ -5,27 +5,87 @@
 \alias{HEXACO_example_data}
 \title{Example HEXACO Response Data}
 \format{
-A data frame with 100 rows and 60 columns.
+A data frame with 2177 rows and 61 columns:
 \describe{
-  \item{SS1, SS2, SS3, SS4, SS5, SS6, SS7, SS8, SS9, SS10,
-        SS11, SS12, SS13, SS14, SS15, SS16, SS17, SS18, SS19, SS20,
-        SS21, SS22, SS23, SS24, SS25, SS26, SS27, SS28, SS29, SS30,
-        SS31, SS32, SS33, SS34, SS35, SS36, SS37, SS38, SS39, SS40,
-        SS41, SS42, SS43, SS44, SS45, SS46, SS47, SS48, SS49, SS50,
-        SS51, SS52, SS53, SS54, SS55, SS56, SS57, SS58, SS59, SS60}{Represents the 60 HEXACO items.}
+\item{Group}{}
+\item{SS1}{}
+\item{SS2}{}
+\item{SS3}{}
+\item{SS4}{}
+\item{SS5}{}
+\item{SS6}{}
+\item{SS7}{}
+\item{SS8}{}
+\item{SS9}{}
+\item{SS10}{}
+\item{SS11}{}
+\item{SS12}{}
+\item{SS13}{}
+\item{SS14}{}
+\item{SS15}{}
+\item{SS16}{}
+\item{SS17}{}
+\item{SS18}{}
+\item{SS19}{}
+\item{SS20}{}
+\item{SS21}{}
+\item{SS22}{}
+\item{SS23}{}
+\item{SS24}{}
+\item{SS25}{}
+\item{SS26}{}
+\item{SS27}{}
+\item{SS28}{}
+\item{SS29}{}
+\item{SS30}{}
+\item{SS31}{}
+\item{SS32}{}
+\item{SS33}{}
+\item{SS34}{}
+\item{SS35}{}
+\item{SS36}{}
+\item{SS37}{}
+\item{SS38}{}
+\item{SS39}{}
+\item{SS40}{}
+\item{SS41}{}
+\item{SS42}{}
+\item{SS43}{}
+\item{SS44}{}
+\item{SS45}{}
+\item{SS46}{}
+\item{SS47}{}
+\item{SS48}{}
+\item{SS49}{}
+\item{SS50}{}
+\item{SS51}{}
+\item{SS52}{}
+\item{SS53}{}
+\item{SS54}{}
+\item{SS55}{}
+\item{SS56}{}
+\item{SS57}{}
+\item{SS58}{}
+\item{SS59}{}
+\item{SS60}{}
 }
 }
 \source{
-https://osf.io/yvpz3/?view_only=08601755f471440b80973194571b60bd
+\url{https://osf.io/yvpz3/?view_only=08601755f471440b80973194571b60bd}
 }
 \usage{
 HEXACO_example_data
 }
 \description{
-Responses to the HEXACO-60 (Ashton & Lee, 2009) scale from 100 actual respondents
+Actual Responses to the HEXACO-60 (Ashton & Lee, 2009) scale.
+These response data are taken from the study conducted by Li and colleagues (2025).
 }
 \references{
-Ashton, M. C., & Lee, K. (2009). The HEXACO–60: A short measure of the major dimensions of personality. 
-\emph{Journal of Personality Assessment, 91}(4), 340-345. https://doi.org/10.1080/00223890902935878
+Ashton, M. C., & Lee, K. (2009). The HEXACO-60: A short measure of the major dimensions of personality.
+\emph{Journal of Personality Assessment, 91}(4), 340-345. \doi{10.1080/00223890902935878}
+
+Li, M., Zhang, B., Li, L., Sun, T., & Brown, A. (2025). Mixed-keying or desirability-matching in the
+construction of forced-choice measures? An empirical investigation and practical recommendations.
+\emph{Organizational Research Methods, 28}(2), 296-329. \doi{10.1177/10944281241229784}
 }
 \keyword{datasets}

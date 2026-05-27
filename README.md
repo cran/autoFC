@@ -1,26 +1,25 @@
-# autoFC
-
-A collection of tools to automatically pair forced-choice items and examine their measurement performance
+# autoFC: Automatic tools for Forced-Choice Scale Assembly, Optimization, Scoring and Simulation
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/grand-total/autoFC)](https://cran.r-project.org/package=autoFC)
 
 ## Overview
 
-Forced-choice (**FC**) tests are gaining researcher's interest increasingly for its faking resistance when well-designed. Well-designed FC tests should often be characterized by *items within a block measuring different latent traits*, and *items within a block having similar magnitude, or high inter-item agreement **(IIA)** in terms of their social desirability*. Other scoring models may also require *factor loading differences or item locations within a block to be maximized or minimized*.
+autoFC is a comprehensive, fully automatic R package designed to support the entire lifecycle of forced-choice (FC) scale development. 
+It provides robust tools for automated test assembly, advanced psychometric scoring (using R, Mplus, or Stan), 
+and data simulation based on the Thurstonian IRT model (Brown & Maydeu-Olivares, 2011).
 
-Either way, decision on which items should be assigned to the same block - item pairing - is a crucial issue in building a well-designed FC test, which is currently carried out manually. However, given that we often need to simultaneously meet multiple objectives, manual pairing will turn out to be impractical and even infeasible, especially when the number of latent traits and/or the number of items per trait become relatively large.
+## What's New in the May 2026 Major Update
+This major update introduces critical performance, usability, and mathematical enhancements. These features are added to allow for
+much easier and convenient use of FC scales, than ever before.
 
-The R package **autoFC** is developed to address these difficulties and provides a tool for facilitating automatic FC test construction as well as evaluating measurement performance using simulation data. It offers users the functionality to:
+- Thurstonian Factor Model (TFM) and Thurstonian IRT (IRT) Support: Native syntax generation and scoring for highly stable first-order and second-order models 
+in lavaan and Mplus, completely bypassing tedious manual constraint declarations.
 
-1.  Include multiple criteria for pairing items into the same block, with user-specified weights and calculating functions for each criterion.
+- Vectorized, C-Level Algorithmic Speedups: Restructured simulated annealing energy calculators and agreement metrics (bp.coeff.raw, gwet.ac1.raw) to achieve significant performance improvements.
 
-2.  Automatically optimize the target function combined from the multiple criteria and produce near-optimal item pairings that satisfy the user-defined criteria.
+- High-Performance Stan Integration: A unified Stan pipeline featuring within-chain parallel computing (reduce_sum) and automatic logical dependency reduction (Heister, Doebler, & Frick, 2025) to easily scale to larger blocks.
 
-3.  Specify blueprints for the FC blocks (i.e., exact specification on how the block should be, for example, in terms of measured traits and keying) and build FC blocks that are aligned with the setups in the blueprints.
+- Blazing Fast Scoring: Fast, vectorized MAP scoring in R using analytical gradients to score participants and calculate Standard Errors in seconds (R and Mplus models).
 
-4.  Produce simulated responses to FC scales, based on the Thurstonian IRT model (Brown & Maydeu-Olivares, 2011), and estimate the Thurstonian IRT model using the simulated responses.
-
-5.  Examine the empirical reliability and measurement precision of the resulting trait scores produced from the estimation model.
-
-Users are allowed to create an FC test of any block size (e.g. Pairs, Triplets, Quadruplets) and they can produce simulated responses to FC scales in both MOLE (Most & Least like me) and RANK formats.
 
 ## Installation
 
@@ -33,52 +32,68 @@ install.packages("autoFC")
 You can install the development version of autoFC from GitHub:
 
 ``` r
-devtools::install_github("tspsyched/autoFC")
+devtools::install_github("mtlpsych/autoFC")
 ```
 
-## Functions
+## Core Functions
 
-Below is a brief explanation of all functions provided by the initial version of **autoFC**.
+**autoFC** divies the FC workflow into several logical stages:
 
-1.  `cal_block_energy()` and `cal_block_energy_with_iia()` both calculate the total energy for a single item block, or a full FC test with multiple blocks, given a data frame of item characteristics. The latter function incorporates IIA metrics into energy calculation.
+### 1. Scale Assembly and Optimization
 
--   By default, numeric item characteristics are paired by minimizing variance within each block, and factor item characteristics are paired such that it's more preferable for items in the same block to be from different factor levels. Each characteristic has a default weight of 1.
--   In addition, `cal_block_energy_with_iia()` incorporates four IIA metrics in which items are paired by maximizing the IIA within each block. Each IIA has a default weight of 1.
+**create_blueprint_template()**: A starter function building up csv templates for users to fill in their own blueprint.
 
-2.  `make_random_block()` takes in number of items and block size as input arguments and produces a test with blocks of randomly paired item numbers. Information about item characteristics is not required.
+**build_blueprint_blocks()**: A block-by-block initializer that constructs starting scales matching the exact trait/sign
+blueprints that user specifies, while also allowing for optimizing item characteristics.
 
-3.  `get_iia()` takes in item responses and a single item block (Or a full FC test with multiple blocks), then returns IIA metrics for each item block.
+**optimize_blocks()** (Previously known as **sa_pairing_generalized()**): The CORE optimization engine based on the 
+Simulated Annealing (SA) algorithm. It is capable of balancing within-block matching on 1 or more criteria (local fit) and overall
+trait pair distributions (global fit), while preventing within-block trait overlap.
 
-4.  `sa_pairing_generalized()` is the automatic pairing function which takes in item characteristics (and also individual responses for all items) and an initial FC test, then optimizes the energy of the test based on Simulated Annealing (SA) algorithm.
+### 2. Data Preparation and Diagnostics
 
--   SA is a probabilistic technique for approximating the global optimum of a given function, in which each iteration involves the cool down of the "Temperature" until it reaches a certain value. Within each iteration, a new solution (**FC test**) is produced and compared with current solution in terms of their energy (Which is calculated by calling `cal_block_energy()` or `cal_block_energy_with_iia()`. Acceptance or rejection of new solution is determined as follows:
+**convert_ranks_to_pairwise(), convert_mole_to_pairwise()**: Converts raw fully ranked responses or "Most-Least Like Me" (MOLE) partial rankings
+into binary pairwise columns, handling unobserved comparisons using NAs.
 
-    -   Better solution (An FC test with higher energy) is always accepted and updated into the new current solution.
-    -   Worse solution (An FC test with lower energy) is conditionally accepted, determined by the current temperature and the deviation of new solution's energy from the current one's. A worse solution is more likely to be accepted when temperature is high and when the deviance is relatively small.
+**summarize_trait_pairs()**: Provides a tabular diagnostic summary of how evenly equally-keyed and mixed-keyed trait pairs are distributed
+across all trait combinations in your FC scale.
 
--   If all items in the item characteristic data frame are used to construct the FC test, `sa_pairing_generalized()` will produce new solutions by randomly exchanging items between two blocks; Otherwise, it will randomly select between exchanging items and replacing with unused items based on proportion of items used to construct the test.
+### 3. Syntax Generation
 
-In the Feb, 2024 update, we added a lot more functions, including the following core ones:
+**generate_tirt_lavaan_syntax(), generate_tirt_mplus_syntax(), generate_tirt_stan_syntax()**: For R and Mplus, generates syntax for either
+First-Order or Second-Order Thurstonian IRT models, also natively supporting character trait names and automated Heywood-case prevention (i.e., negative residual variances).
+For Stan, generates a unified, pre-compiled Stan model with multithread capabilities and logical dependency reduction.
 
-1.  `construct_blueprint()` builds up exact specifications of the FC blocks (i.e., blueprints), which typically indicates the keying and measured traits of each item for each block. An additional matching criteria can also be set, indicating how well should the items be matched based on certain indicators using a pre-specified cutoff.
+### 4. Scoring and Estimation
+All three functions below now allow score estimation for not only original calibration sample, **BUT ALSO for new samples**.
 
-2.  `build_scale_with_blueprint()` takes in the blueprint that user built manually or through `construct_blueprint()` and automatically produces the paired FC blocks consistent with the specifications in the blueprint.
+**score_tirt_lavaan()**: Fast MAP scoring and Standard Error (Yes, now available) estimation in R for lavaan models 
+estimated from the model produced by **generate_tirt_lavaan_syntax()**.
+Also supports both first- and second-order parameterizations.
 
--   This is an addition to the automatic item pairing module as was already there back in the earlier version of autoFC. Typically when users want to construct FC scales, they would wish at least some blocks to be exactly in certain designs. This function exactly serves as that purpose.
+**score_tirt_mplus()**: Fast parameter extraction from Mplus .out files and participant scoring using R, bypassing Mplus's FSCORES engine.
 
-3.  `get_simulation_matrices()` produces simulated item and person parameters based on the Thurstonian IRT model, using the factor analysis results extracted from `lavaan::cfa()` or `get_CFA_estimates()`.
+**score_tirt_stan()**: Used in conjunction with **prepare_tirt_stan_data()**. Based on the modern features in cmdstan package, 
+now it allows very fast scoring and prediction in Stan (at least 10x faster than stan prediction methods in earlier versions).
+In the case of Stan, use **predict_tirt_stan()** for predicting trait scores of new samples.
 
-4.  `convert_to_TIRT_response()`, `get_TIRT_long_data()`, `fit_TIRT_model()` are extensions to the various functions in the *ThurstonianIRT* package (Bürkner, 2019) which allow the simulated (using `convert_to_TIRT_response()`) or actual responses to FC scales to be processed and converted into long format (using `get_TIRT_long_data()`) and fitted using lavaan, Mplus or stan methods (using `fit_TIRT_model()`).
+**empirical_reliability()**: Calculates the test-level empirical reliability of estimated trait scores (Brown & Maydeu-Olivares, 2018).
 
-5.  `RMSE_range()`, `plot_scores()`, and `empirical_reliability()` for diagnostic purposes, examining the measurement accuracy of the trait scores produced from the TIRT model.
+### 5. Parameter Extraction & Response Simulation
 
-Detailed descriptions of all functions and other functions that are not listed here can be found in the manual and the help document of each function.
+**get_CFA_estimates()**: Fits CFA model and/or extracts item parameters from raw Likert data or pre-fitted lavaan objects.
 
-We also recently published a paper (Li et al., 2024) discussing the issues related to the development of forced-choice scales, which also includes a detailed tutorial on how to construct FC scales using these latest functionalities of the *autoFC* package. Users are also encouraged to refer to this paper for further details.
+**get_simulation_matrices()**: Simulates latent traits, item parameters, and continuous utilities for Thurstonian IRT modeling, based on fitted CFA models.
+
+**plot_scores()**: Visual diagnostics for comparing true vs. estimated scores, complete with reference lines.
+
+**RMSE_range()**: Evaluates trait recovery accuracy across specified intervals of the latent continuum.
+
 
 
 ## References
-Brown, A., & Maydeu-Olivares, A. (2011). Item response modeling of forced-choice questionnaires. *Educational and Psychological Measurement, 71*(3), 460-502. https://doi.org/10.1177/0013164410375112
-Bürkner, P. C. (2019). thurstonianIRT: Thurstonian IRT models in R. *Journal of Open Source Software, 4*(42), 1662. https://doi.org/10.21105/joss.01662
-Li, M., Zhang, B., Li, L., Sun, T., & Brown, A., (2024). Mixed-Keying or Desirability-Matching in the Construction of Forced-Choice Measures? An Empirical Investigation and Practical Recommendations. *Organizational Research Methods*. https://doi.org/10.1177/10944281241229784
+Brown, A., & Maydeu-Olivares, A. (2018). Ordinal factor analysis of graded-preference questionnaire data. *Structural Equation Modeling: A Multidisciplinary Journal, 25*(4), 516-529. https://doi.org/10.1080/10705511.2017.1392247
+
+Li, M., Zhang, B., Li, L., Sun, T., & Brown, A. (2025). Mixed-keying or desirability-matching in the construction of forced-choice measures? An empirical investigation and practical recommendations. *Organizational Research Methods, 28*(2), 296-329. https://doi.org/10.1177/10944281241229784
+
 

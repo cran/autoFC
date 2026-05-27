@@ -4,33 +4,35 @@
 \alias{plot_scores}
 \title{Scatter Plot for True vs Estimated Scores, True Score vs Absolute Error, etc.}
 \usage{
-plot_scores(x_scores, y_scores, type = "simple", ...)
+plot_scores(x_scores, y_scores, type = c("simple", "abs.diff"), ...)
 }
 \arguments{
-\item{x_scores}{Scores to be plotted on the x axis}
+\item{x_scores}{Numeric vector. Scores to be plotted on the x-axis (typically True Scores).}
 
-\item{y_scores}{Scores to be plotted on the y axis}
+\item{y_scores}{Numeric vector. Scores to be plotted on the y-axis (typically Estimated Scores).}
 
-\item{type}{Which type of plots is plotted? Can be \code{"simple"} for simple x-y plot, or \code{"abs.diff"}
-for plotting absolute difference of (y-x) vs x.}
+\item{type}{Character. Which type of plot to display? Options are \code{"simple"}
+for an x-y scatter plot, or \code{"abs.diff"} for plotting the absolute
+difference \code{abs(y - x)} against x. Defaults to \code{"simple"}.}
 
-\item{...}{Other parameters used in \code{plot()}}
+\item{...}{Additional graphical parameters passed to \code{plot()} (e.g., \code{main}, \code{pch}).}
 }
 \value{
-A scatter plot
+A base R scatter plot.
 }
 \description{
-This function is a simple plot for diagnostic purposes examining
-the performance of the FC scale based on simulated data.
+This function provides a simple, enhanced diagnostic plot examining
+the performance of the forced-choice scale based on simulated or known true scores.
 }
 \details{
-This is only a very crude plot function extending \code{plot()} for demonstrative purposes.
-Users are free to develop their own versions of plotting.
+This function extends base R \code{plot()} by automatically adding
+standard diagnostic reference lines (a 1:1 identity line for "simple", and a
+0-error baseline for "abs.diff") to aid visual inspection of bias.
 }
 \examples{
-plot_scores(rnorm(100), rnorm(100))
+true <- rnorm(100)
+est <- true + rnorm(100, 0, 0.3)
+plot_scores(true, est, type = "simple", main = "Recovery")
+plot_scores(true, est, type = "abs.diff", main = "Error Magnitude")
 
-}
-\author{
-Mengtong Li
 }

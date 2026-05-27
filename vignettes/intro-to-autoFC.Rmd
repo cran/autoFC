@@ -1,0 +1,349 @@
+---
+title: "Getting Started with autoFC"
+author: "Mengtong Li"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with autoFC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The `autoFC` package is an end-to-end toolkit designed for **Automated Test Assembly (ATA)** and scoring of Multidimensional Forced-Choice (MFC) measures, covering the whole life cycle of MFC, from data preparation, automated test assembly, scoring (using R, Mplus, or Stan), to data simulation, and many more.
+
+This vignette demonstrates the core workflow of the package:
+
+1. Loading package and example data (Likert responses, item information, different block designs).
+
+2. Constructing an initial random set of blocks.
+
+3. Optimizing blocks using **Simulated Annealing**.
+
+4. Examining the scale-level trait-pair diagnostics.
+
+5. Scoring respondents using classical **Ipsative (Sum) Scoring**.
+
+6. Scoring respondents using **TIRT Scoring**.
+
+
+## 1. Load the Package and Example Data
+
+We begin by loading `autoFC` and our built-in dataset containing responses to 60 HEXACO items from 2,177 respondents.
+
+```{r load_response}
+library(autoFC)
+
+# Load the built-in HEXACO data
+data("HEXACO_example_data")
+head(HEXACO_example_data[, 1:5])
+```
+
+We also load the keying and factor information of these items. For use in later steps, we manually add in the mean ratings of these items.
+
+```{r load_item_info}
+data("FC_item_info")
+
+
+FC_item_info$M_Score <- colMeans(HEXACO_example_data[, -1], na.rm = TRUE)
+head(FC_item_info)
+```
+
+## 2. Generate Initial Block Solution
+
+Before we can optimize, we can construct a starting layout of blocks. We will group the 60 items into **20 triplet blocks** (block size = 3) in a completely random manner.
+
+```{r initial-solution}
+set.seed(123)
+
+# Build 20 random triplets from the 60 items
+starting_blocks <- make_random_block(total_items = 60, block_size = 3)
+starting_blocks
+```
+
+## 3. Optimize Blocks using Simulated Annealing
+
+Next, we run the core optimization engine. In this case, we want to find a design that:
+
+1. Items in the same block measure different traits (preventing trait overlap).
+
+2. Items in the same block are matched closely on their mean scores (i.e., social desirability rating).
+
+*(In this case, we run a fast optimization with a rather high cooling rate. For real-world applications, we recommend setting `temp_cooling` to values closer to 1, and `temp_stop_ratio` to be smaller values, both of which can ensure more comprehensive optimization)*
+
+```{r optimize}
+# Run the simulated annealing optimizer
+set.seed(2026)
+optimized_test <- optimize_blocks(
+  block = starting_blocks, 
+  total_items = 60,
+  item_chars = FC_item_info[, -1],                  # Containing item characteristics (Keying, factor, mean scores)
+  # We give keying a weight of 1, factor weight of 2 (soft constraints for preventing overlap; hard constraints can be added as long as you provide target_dist parameter)
+  # Weight for mean scores is set higher at -5 (because we want to REDUCE the absolute difference or variance of item mean scores within a block)
+  char_weights = c(1, 2, -5),                       
+  optim_funcs = c("var", "facfun", "var"),          # Minimize variance for item mean scores
+  temp_cooling = 0.999,                              # Fast cooling for vignette speed
+  temp_stop_ratio = 1e-6
+)
+
+# View the optimized block matrix
+final_blocks <- optimized_test$block_final
+head(FC_item_info[c(t(final_blocks)),])
+
+```
+
+## 4. Evaluate Scale-Level Trait Diagnostics
+
+Good FC scales should ideally have even distribution of trait-pair comparisons. We can use the `summarize_trait_pairs()` function to check out how many equal-keyed and mixed-keyed trait pairs our optimized test generated:
+
+```{r diagnostics}
+# Check the structural pair distribution of our constructed test
+diagnostics <- summarize_trait_pairs(
+  blocks = final_blocks,
+  item_chars = FC_item_info,
+  trait_col = "factor",
+  key_col = "keying"
+)
+
+# View the diagnostic table
+diagnostics
+```
+
+You may notice that the trait pairs are not quite evenly distributed. To ensure more balanced distribution (and also prevent trait overlapping), we can specify the desired distribution of equally keyed and mixed keyed pairs using the `build_target_dist()` function.
+
+```{r constract desired trait distributions}
+target_dist <- build_target_dist(traits = unique(FC_item_info$factor), total_pairs = 60, 
+                                 equal_mixed_ratio = c(1, 1), allow_same_trait = FALSE)
+head(target_dist)
+```
+
+Then, we specify this desired distribution in the `optimized_test()` function.
+```{r}
+optimized_test2 <- optimize_blocks(
+  block = starting_blocks, 
+  total_items = 60,
+  item_chars = FC_item_info[, -1],                  
+  char_weights = c(1, 2, -5),                       
+  optim_funcs = c("var", "facfun", "var"),          
+  temp_cooling = 0.999,                             
+  target_dist = target_dist,                    # NEW: Now we have a pre-specified target distribution
+  trait_col = "factor",                         # NEW: Now we should tell optimize_blocks() which column specifies item traits in item_chars
+  key_col = "keying",                           # NEW: Now we should tell optimize_blocks() which column specifies item keying in item_chars
+  scale_fit_weight = 100,                       # NEW: How much do we value the consistency with our desired target distribution?
+  prevent_overlap = TRUE,                       # NEW: Don't put items measuring the same traits in the same block!
+  temp_stop_ratio = 1e-6)
+
+final_blocks2 <- optimized_test2$block_final
+head(FC_item_info[c(t(final_blocks2)),])
+
+```
+
+Running the diagnostic again, you will see that now the trait distribution now aligns with our desired settings.
+You may further tweak `target_dist` to try other specical distributions - `build_target_dist()` can also check the feasibility of your design for you.
+```{r diagnostics2}
+
+# Check the structural pair distribution of our constructed test
+diagnostics2 <- summarize_trait_pairs(
+  blocks = final_blocks2,
+  item_chars = FC_item_info,
+  trait_col = "factor",
+  key_col = "keying"
+)
+
+# View the diagnostic table
+diagnostics2
+
+```
+
+## 5. Ipsative FC Scoring
+
+Now for the actual scoring. Once your participants take the newly constructed test and you obtain their pairwise binary responses, you can easily calculate their classical **Ipsative (Sum) Scores**. Our scoring engine automatically handles reverse-keying logic and safely handles partial ranking data (like MOLE formats).
+
+In the following part, we use the one of the actual FC scales constructed in our recent study (Li et al., 2025), to demonstrate how data processing and scoring can be done. This scale has a block size of 3 and is designed in MOLE format.
+
+We first load the response data and peek into it:
+
+```{r}
+data("MOLE_data")
+
+
+MOLE_data <- MOLE_data[!is.na(MOLE_data$Q1_0_GROUP_T1),]
+head(MOLE_data)
+```
+
+This dataset is directly exported from Qualtrics, so it is as close to real-world data you will encounter as possible.
+The FC scale contains 20 blocks, which are represented as prefix Q1-Q20 in the column names.
+
+With each block, the "0_GROUP" columns represents the "MOST like me" options (i.e., Which of the 3 items in that block is chosen as MOST like me), and the "1_GROUP" columns represents the "LEAST like me" options.
+
+We use the response data from the first group, and then convert the MOLE response into pairwise format:
+
+```{r convert to pairwise}
+resp_data <- MOLE_data[MOLE_data$Group == "FC1", ]
+resp_data <- resp_data[, -41]    ### Remove the last column indicating group
+
+resp_pairwise_data <- convert_mole_to_pairwise(resp_data, n_blocks = 20, block_size = 3)
+
+### This data will be readily used for later scoring!
+head(resp_pairwise_data)
+```
+
+Now we calculate respondents' ipsative trait scores using the `score_tirt_ipsative()` function.
+
+You need to specify a `key_matrix` and tell the function which column specifies the trait (`trait_col`), 
+and which column specifies keying (`key_col`).
+
+```{r ipsative scoring}
+data("FC_blocks")
+### Because blocks in FC1 do not follow 1, 2, 3... 60 item order, we need to adjust into item orders that are actually presented in FC1
+FC1_item_info <- FC_item_info[FC_blocks$FC1_Blocks, ]
+
+ipsative_scores <- score_tirt_ipsative(resp_pairwise_data, n_blocks = 20, block_size = 3,
+                                       key_matrix = FC1_item_info, trait_col = "factor", key_col = "keying")
+
+head(ipsative_scores)
+```
+
+
+## 6. Thurstonian IRT (TIRT) FC Scoring
+
+Modern scoring models of FC measures further utilize the information incorporated in the pairwise comparisons. We showcase how TIRT models can be used for FC scoring below.
+
+`autoFC` provides three avenues for TIRT FC scoring: Using lavaan, Mplus and Stan.
+
+Due to proprietary constraints for Mplus, we showcase how scoring is done in lavaan and Stan below.
+
+### Scoring in lavaan
+
+For lavaan, we first need to build up the scoring lavaan model, using `generate_tirt_lavaan_syntax()`. 
+
+```{r build lavaan model}
+tirt_lavaan <- generate_tirt_lavaan_syntax(n_blocks = 20, block_size = 3, key_matrix = FC1_item_info,
+                                           trait_col = "factor", key_col = "keying", model_type = "TFM",
+                                           force_positive_variances = FALSE)     ## In practice, you can set it to TRUE
+# cat(tirt_lavaan)
+```
+
+Next, we fit the model using the pairwise input data:
+
+```{r test lavaan model, eval = FALSE}
+library(lavaan)
+example_fit_lavaan <- sem(tirt_lavaan, data = resp_pairwise_data, parameterization = "theta",
+                          estimator = "ULSMV", verbose = TRUE, ordered = TRUE, std.lv = FALSE, mimic = "mplus")
+```
+
+We can now readily score the respondents and produce standard errors using our `score_tirt_lavaan()` almost instantly!
+
+These scores also correlated highly with traditional ipsative scores.
+```{r score lavaan, eval = FALSE}
+tirt_lavaan_scores <- score_tirt_lavaan(example_fit_lavaan, data = resp_pairwise_data)
+```
+
+```{r load-precomputed, echo = FALSE}
+tirt_lavaan_scores <- readRDS("fit_FC_lavaan.rds")
+```
+
+```{r correlation}
+### Now check out how the scores correlated with ipsative scores.
+cor(tirt_lavaan_scores$honestyhumility, ipsative_scores$honestyhumility)
+cor(tirt_lavaan_scores$emotionality, ipsative_scores$emotionality)
+cor(tirt_lavaan_scores$extraversion, ipsative_scores$extraversion)
+cor(tirt_lavaan_scores$agreeableness, ipsative_scores$agreeableness)
+cor(tirt_lavaan_scores$conscientiousness, ipsative_scores$conscientiousness)
+cor(tirt_lavaan_scores$openness, ipsative_scores$openness)
+
+```
+
+### Scoring in stan
+
+For Stan, we also need to first prepare data ready for Stan...
+```{r standata}
+stan_data <- prepare_tirt_stan_data(resp_pairwise_data, n_blocks = 20, block_size = 3,
+                                    key_matrix = FC1_item_info, trait_col = "factor", key_col = "keying")
+```
+
+And then estimate the model! 
+**Note**: In your case, you may need to install cmdstanr before you proceed.
+
+You can install the latest release of the cmdstanr R package with
+
+`install.packages("cmdstanr", repos = c('https://stan-dev.r-universe.dev', getOption("repos")))`
+
+Then run:
+
+`cmdstanr::install_cmdstan()`
+
+
+```{r runstan, eval = FALSE}
+example_fit_stan <- score_tirt_stan(stan_data, chains = 4, parallel_chains = 4,
+                                    threads_per_chain = 4,
+                                    iter_warmup = 1000, iter_sampling = 1000,
+                                    init = 0)
+
+```
+
+```{r load-precomputed stan, echo = FALSE}
+example_fit_stan <- readRDS("fit_FC_stan.rds")
+```
+
+We then check out how well the scores estimated from different methods converge:
+```{r convergent validity}
+tirt_stan_scores <- example_fit_stan$scores
+
+### Correlation between stan and lavaan scores
+cor(tirt_stan_scores$honestyhumility, tirt_lavaan_scores$honestyhumility)
+cor(tirt_stan_scores$emotionality, tirt_lavaan_scores$emotionality)
+cor(tirt_stan_scores$extraversion, tirt_lavaan_scores$extraversion)
+cor(tirt_stan_scores$agreeableness, tirt_lavaan_scores$agreeableness)
+cor(tirt_stan_scores$conscientiousness, tirt_lavaan_scores$conscientiousness)
+cor(tirt_stan_scores$openness, tirt_lavaan_scores$openness)
+
+### Correlation between stan and ipsative scores
+cor(tirt_stan_scores$honestyhumility, ipsative_scores$honestyhumility)
+cor(tirt_stan_scores$emotionality, ipsative_scores$emotionality)
+cor(tirt_stan_scores$extraversion, ipsative_scores$extraversion)
+cor(tirt_stan_scores$agreeableness, ipsative_scores$agreeableness)
+cor(tirt_stan_scores$conscientiousness, ipsative_scores$conscientiousness)
+cor(tirt_stan_scores$openness, ipsative_scores$openness)
+
+```
+Finally, we compute Likert sum scores and see how FC scores were consistent with their Likert counterpart!
+```{r}
+HEXACO_example_data$H_SUM = rowSums(HEXACO_example_data[, c(7, 19, 37, 55)]) + 36 - rowSums(HEXACO_example_data[, c(13, 25, 31, 43, 49, 61)])
+HEXACO_example_data$E_SUM = rowSums(HEXACO_example_data[, c(6, 12, 18, 24, 30, 48)]) + 24 - rowSums(HEXACO_example_data[, c(36, 42 ,54, 60)])
+HEXACO_example_data$X_SUM = rowSums(HEXACO_example_data[, c(5, 17, 23, 35, 41, 59)]) + 24 - rowSums(HEXACO_example_data[, c(11, 29, 47, 53)])
+HEXACO_example_data$A_SUM = rowSums(HEXACO_example_data[, c(4, 28, 34, 40, 46, 52)]) + 24 - rowSums(HEXACO_example_data[, c(10, 16, 22, 58)])
+HEXACO_example_data$C_SUM = rowSums(HEXACO_example_data[, c(3, 9, 39, 51)]) + 36 - rowSums(HEXACO_example_data[, c(15, 21, 27, 33, 45, 57)])
+HEXACO_example_data$O_SUM = rowSums(HEXACO_example_data[, c(8, 14, 26, 38, 44)]) + 30 - rowSums(HEXACO_example_data[, c(2, 20, 32, 50, 56)])
+
+cor(HEXACO_example_data$H_SUM[HEXACO_example_data$Group == "FC1"], tirt_lavaan_scores$honestyhumility)
+cor(HEXACO_example_data$E_SUM[HEXACO_example_data$Group == "FC1"], tirt_lavaan_scores$emotionality)
+cor(HEXACO_example_data$X_SUM[HEXACO_example_data$Group == "FC1"], tirt_lavaan_scores$extraversion)
+cor(HEXACO_example_data$A_SUM[HEXACO_example_data$Group == "FC1"], tirt_lavaan_scores$agreeableness)
+cor(HEXACO_example_data$C_SUM[HEXACO_example_data$Group == "FC1"], tirt_lavaan_scores$conscientiousness)
+cor(HEXACO_example_data$O_SUM[HEXACO_example_data$Group == "FC1"], tirt_lavaan_scores$openness)
+
+cor(HEXACO_example_data$H_SUM[HEXACO_example_data$Group == "FC1"], tirt_stan_scores$honestyhumility)
+cor(HEXACO_example_data$E_SUM[HEXACO_example_data$Group == "FC1"], tirt_stan_scores$emotionality)
+cor(HEXACO_example_data$X_SUM[HEXACO_example_data$Group == "FC1"], tirt_stan_scores$extraversion)
+cor(HEXACO_example_data$A_SUM[HEXACO_example_data$Group == "FC1"], tirt_stan_scores$agreeableness)
+cor(HEXACO_example_data$C_SUM[HEXACO_example_data$Group == "FC1"], tirt_stan_scores$conscientiousness)
+cor(HEXACO_example_data$O_SUM[HEXACO_example_data$Group == "FC1"], tirt_stan_scores$openness)
+
+cor(HEXACO_example_data$H_SUM[HEXACO_example_data$Group == "FC1"], ipsative_scores$honestyhumility)
+cor(HEXACO_example_data$E_SUM[HEXACO_example_data$Group == "FC1"], ipsative_scores$emotionality)
+cor(HEXACO_example_data$X_SUM[HEXACO_example_data$Group == "FC1"], ipsative_scores$extraversion)
+cor(HEXACO_example_data$A_SUM[HEXACO_example_data$Group == "FC1"], ipsative_scores$agreeableness)
+cor(HEXACO_example_data$C_SUM[HEXACO_example_data$Group == "FC1"], ipsative_scores$conscientiousness)
+cor(HEXACO_example_data$O_SUM[HEXACO_example_data$Group == "FC1"], ipsative_scores$openness)
+```
+
+
+
+

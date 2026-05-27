@@ -19,7 +19,7 @@ An \emph{n} by \emph{k} matrix indicating the four IIA metrics for each item blo
 }
 \description{
 This function prints IIA metrics for select items,
-             given the individual responses for the items.
+given the individual responses for the items.
 }
 \examples{
   item_responses <- matrix(sample(seq(1:5), 600*60, replace = TRUE), ncol = 60, byrow = TRUE)

@@ -2,35 +2,50 @@
 % Please edit documentation in R/empirical_reliability.R
 \name{empirical_reliability}
 \alias{empirical_reliability}
-\title{Calculate the Empirical Reliability of the Latent Trait Scores,
-Following the Formula in Brown & Maydeu-Olivares (2018).}
+\title{Empirical Reliability Estimates}
 \usage{
-empirical_reliability(dataset, score_names, se_names)
+empirical_reliability(dataset, score_names, se_names = NULL)
 }
 \arguments{
-\item{dataset}{Data frame with trait estimates and standard errors}
+\item{dataset}{A data frame containing the trait estimates and standard errors.}
 
-\item{score_names}{Vector of characters. Which columns specify trait scores?}
+\item{score_names}{Character vector. The names of the columns specifying trait scores.}
 
-\item{se_names}{Vector of characters. Which columns specify trait standard errors?}
+\item{se_names}{Optional character vector. The names of the columns specifying trait
+standard errors. If \code{NULL}, the function automatically searches for columns
+named \code{"[score_name]_SE"}.}
 }
 \value{
-A numeric vector containing empirical reliability estimates, ordered the same as in \code{score_names}.
+A named numeric vector containing the empirical reliability estimates
+for each trait.
 }
 \description{
-Calculates the empirical reliability using the formula in Brown & Maydeu-Olivares (2018).
+Calculates empirical reliability for IRT-based trait scores
+using the formula provided by Brown & Maydeu-Olivares (2018).
 }
 \details{
-For trait scores estimated using item response theory models, a suitable reliability estimate
-is empirical reliability, which provides a summary estimate on how reliable the trait scores are "as a whole".
+For trait scores estimated using item response theory (IRT) models, a single
+test-level reliability coefficient (like Cronbach's Alpha) is often inappropriate
+because the standard error of measurement varies across the latent continuum.
+
+Empirical reliability provides a summary estimate of how reliable the trait scores
+are "as a whole" by comparing the variance of the estimated scores to the average
+error variance.
 }
 \examples{
-\dontrun{empirical_reliability(dataset, c("Trait1", "Trait2", "Trait3"), c("se1", "se2", "se3"))}
+# Create fake scores and standard errors
+fake_scores <- data.frame(
+  Trait1 = rnorm(100), Trait1_SE = runif(100, 0.1, 0.3),
+  Trait2 = rnorm(100), Trait2_SE = runif(100, 0.2, 0.4)
+)
+
+# Auto-detects the "_SE" columns
+empirical_reliability(fake_scores, score_names = c("Trait1", "Trait2"))
 
 }
 \references{
-Brown, A., & Maydeu-Olivares, A. (2018). Ordinal factor analysis of graded-preference questionnaire data. 
-\emph{Structural Equation Modeling: A Multidisciplinary Journal, 25}(4), 516-529. https://doi.org/10.1080/10705511.2017.1392247
+Brown, A., & Maydeu-Olivares, A. (2018). Ordinal factor analysis of graded-preference
+questionnaire data. \emph{Structural Equation Modeling, 25}(4), 516-529. \doi{10.1080/10705511.2017.1392247}
 }
 \author{
 Mengtong Li

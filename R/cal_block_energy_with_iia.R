@@ -1,147 +1,74 @@
-#' Calculation of Item Block "Energy" with IIAs Included
+#' Fast Calculation of Item Block "Energy" with Inter-Item Agreement
 #'
-#' @description Calculates the total "energy" of one or multiple paired
-#' item blocks, which is a linear combination of different functions
-#' applied to different item characteristics of interest.
+#' @description Calculates local block energy including IIA metrics. Heavily 
+#' optimized for Simulated Annealing.
 #'
-#' This function extends \code{cal_block_energy} function
-#' with consideration of inter item agreement (IIA) metrics.
+#' @param block An \emph{n} by \emph{k} integer matrix of item indices.
+#' @param char_list A list of vectors for item characteristics.
+#' @param weights A numeric vector of weights for item characteristics.
+#' @param fun_list A list of pre-matched R function objects.
+#' @param rater_chars A matrix of participant responses.
+#' @param iia_weights A numeric vector of length 4 for IIA metrics.
+#' @param verbose Logical. If TRUE, prints metrics. Defaults to FALSE.
 #'
-#' @usage cal_block_energy_with_iia(block, item_chars, weights,
-#'                                  FUN, rater_chars,
-#'                                  iia_weights = c(BPlin = 1, BPquad = 1,
-#'                                  AClin = 1, ACquad = 1), verbose = FALSE)
-#'
-#' @param block,item_chars,weights,FUN See \code{?cal_block_energy} for details.
-#'
-#' @param rater_chars A \emph{p} by \emph{m} numeric matrix with scores of each of the \emph{p}
-#' participants for the \emph{m} items.
-#'
-#' @param iia_weights A vector of length 4 indicating weights given to each IIA metric:
-#'
-#' Linearly weighted AC (Gwet, 2008; 2014);
-#'
-#' Quadratic weighted AC;
-#'
-#' Linearly weighted Brennan-Prediger (BP) Index(Brennan & Prediger, 1981; Gwet, 2014);
-#'
-#' Quadratic weighted BP.
-#'
-#' @param verbose Logical. Should IIAs be printed when this function is called?
-#'
-#' @details
-#' This energy calculation function serves as the core for determining
-#' the acceptance or rejection of a newly built block over the previous one.
-#' Higher energy is considered more preferable in this case.
-#'
-#' Items in the same block can be paired based on characteristics such as:
-#' Mean score, Item Factor, Factor loading, Item IRT Parameters,
-#' Reverse Coding, etc.
-#'
-#' In addition, IIAs can be adopted to further estimate
-#' rater agreements between different items,
-#' if such information is available for the researchers.
-#'
-#' Pairings of different characteristics can be optimized in different way,
-#' by determining the customized function vector \code{FUN}
-#' and the corresponding \code{weights}.
-#' Currently only linear weighted combination
-#' for IIAs can be used in optimization.
-#'
-#'
-#'
-#' @returns A numeric value indicating the total energy
-#' for the given item block(s).
-#'
-#' @author Mengtong Li
-#'
-#' @references
-#' Brennan, R. L., & Prediger, D. J. (1981). Coefficient kappa: Some uses, misuses,
-#' and alternatives. \emph{Educational and Psychological Measurement, 41}(3),
-#' 687-699. https://doi.org/10.1177/001316448104100307
-#'
-#' Gwet, K. L. (2008). Computing inter rater reliability and its
-#' variance in the presence of high agreement.
-#' \emph{British Journal of Mathematical and Statistical Psychology, 61}(1),
-#' 29-48. https://doi.org/10.1348/000711006X126600
-#'
-#' Gwet, K. L. (2014). \emph{Handbook of inter-rater reliability (4th ed.):
-#' The definitive guide to measuring the extent of agreement among raters}.
-#' Gaithersburg, MD: Advanced Analytics Press.
-#' 
-#' @note Use \code{cal_block_energy_with_iia} if inter-item agreement
-#' (IIA) metrics are needed.
-#'
-#' @seealso \code{cal_block_energy}
-#'
-#' @examples
-#' ## Simulate 60 items loading on different Big Five dimensions,
-#' ## with different mean and item difficulty
-#'
-#' item_dims <- sample(c("Openness","Conscientiousness","Neuroticism",
-#'                      "Extraversion","Agreeableness"), 60, replace = TRUE)
-#' item_mean <- rnorm(60, 5, 2)
-#' item_difficulty <- runif(60, -1, 1)
-#'
-#' ## Construct data frame for item characteristics and produce
-#' ## 20 random triplet blocks with these 60 items
-#'
-#' item_df <- data.frame(Dimensions = item_dims, Mean = item_mean,
-#'                      Difficulty = item_difficulty)
-#' solution <- make_random_block(60, 60, 3)
-#'
-#'
-#' ## Simple simulation of responses from 600 participants on the 60 items.
-#' ## In practice, should use real world data or simluation based on IRT parameters.
-#'
-#' item_responses <- matrix(sample(seq(1:5), 600*60, replace = TRUE), ncol = 60, byrow = TRUE)
-#'
-#'
-#' cal_block_energy_with_iia(solution, item_chars = item_df, weights = c(1,1,1),
-#'                           FUN = c("facfun", "var", "var"),
-#'                           rater_chars = item_responses, iia_weights = c(1,1,1,1))
-#'
-#'
+#' @returns A numeric value indicating the total energy.
 #' @export
-
-
-cal_block_energy_with_iia <- function(block, item_chars, weights, FUN, rater_chars,
+cal_block_energy_with_iia <- function(block, char_list, weights, fun_list, rater_chars,
                                       iia_weights = c(BPlin = 1, BPquad = 1, AClin = 1, ACquad = 1),
                                       verbose = FALSE) {
-  if (missing(block)) {
-    block <- make_random_block(nrow(item_chars), item_per_block = 2)
-  }
-  if (missing(FUN)) {
-    types <- sapply(item_chars, class)
-    types <- replace(types, types == "factor" | types == "character", "facfun")
-    types <- replace(types, types == "numeric", "var")
-    FUN <- types
-  }
-  if (missing(weights)) {
-    weights <- rep(1, ncol(item_chars))
-  }
-
-  indices <- seq(1:ncol(item_chars))
+  
   energy <- 0
-
-  # Apply separate functions for each item characteristic to get an estimate of energy, then sum this up.
-  for (row in seq(1:nrow(block))) {
-    for (i in indices) {
-      fun_i <- FUN[i]
-      energy <- energy + weights[i] * eval(call(fun_i, item_chars[block[row,], i]))
-    }
-    # Then we add up IIA metrics.
-    selected_item <- rater_chars[,block[row,]]
-    BPlin <- bp.coeff.raw(selected_item, weights = "linear")$est[,4]
-    BPquad <- bp.coeff.raw(selected_item, weights = "quadratic")$est[,4]
-    AClin <- gwet.ac1.raw(selected_item, weights = "linear")$est[,4]
-    ACquad <- gwet.ac1.raw(selected_item, weights = "quadratic")$est[,4]
-    iia_energy <- iia_weights %*% c(BPlin, BPquad, AClin, ACquad)
-    if (verbose == TRUE) {
-      print(sprintf("BPlin: %f, BPquad: %f, AClin: %f, ACquad: %f", BPlin, BPquad, AClin, ACquad))
+  n_chars <- length(char_list)
+  
+  # 1. Base Item Characteristics Energy 
+  for (i in seq_len(n_chars)) {
+    if (weights[i] == 0) next 
+    
+    char_vec <- char_list[[i]]
+    func <- fun_list[[i]]
+    
+    block_vals <- apply(block, 1, function(row_idx) func(char_vec[row_idx]))
+    energy <- energy + sum(block_vals) * weights[i]
+  }
+  
+  # 2. Inter-Item Agreement (IIA) Energy 
+  do_bplin  <- iia_weights[1] != 0
+  do_bpquad <- iia_weights[2] != 0
+  do_aclin  <- iia_weights[3] != 0
+  do_acquad <- iia_weights[4] != 0
+  
+  if (do_bplin || do_bpquad || do_aclin || do_acquad) {
+    iia_energy <- 0
+    
+    for (row in 1:nrow(block)) {
+      selected_item <- rater_chars[, block[row, ], drop = FALSE]
+      
+      bplin_val <- 0; bpquad_val <- 0; aclin_val <- 0; acquad_val <- 0
+      
+      if (do_bplin) {
+        bplin_val <- bp.coeff.raw(selected_item, weights = "linear")$est[, 4]
+        iia_energy <- iia_energy + (iia_weights[1] * bplin_val)
+      }
+      if (do_bpquad) {
+        bpquad_val <- bp.coeff.raw(selected_item, weights = "quadratic")$est[, 4]
+        iia_energy <- iia_energy + (iia_weights[2] * bpquad_val)
+      }
+      if (do_aclin) {
+        aclin_val <- gwet.ac1.raw(selected_item, weights = "linear")$est[, 4]
+        iia_energy <- iia_energy + (iia_weights[3] * aclin_val)
+      }
+      if (do_acquad) {
+        acquad_val <- gwet.ac1.raw(selected_item, weights = "quadratic")$est[, 4]
+        iia_energy <- iia_energy + (iia_weights[4] * acquad_val)
+      }
+      
+      if (verbose) {
+        cat(sprintf("Block %d -> BPlin: %f, BPquad: %f, AClin: %f, ACquad: %f\n", 
+                    row, bplin_val, bpquad_val, aclin_val, acquad_val))
+      }
     }
     energy <- energy + iia_energy
-
   }
+  
   return(energy)
 }

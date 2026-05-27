@@ -18,8 +18,13 @@
 #'   facfun(c("Openness", "Openness", "Agreeableness"))
 #' @export
 
-facfun <- function(vec){
-  if (typeof(vec) == "list") {vec <- unlist(vec)}
-  if (length(vec) == 0) {stop("Should input a vector or list with elements.")}
-  return(ifelse(length(vec) == length(unique(vec)), 1, 0))
+facfun <- function(vec) {
+  
+  if (length(vec) == 0) stop("'vec' must contain at least one element.")
+  
+  # as.integer() instantly converts TRUE to 1 and FALSE to 0.
+  # anyDuplicated() is a highly optimized C-level function in R that is 
+  # significantly faster than length(unique(vec)).
+  
+  return(as.integer(anyDuplicated(vec) == 0L))
 }

@@ -4,54 +4,44 @@
 \alias{make_random_block}
 \title{Construction of Random Item Blocks}
 \usage{
-make_random_block(total_items, target_items = total_items, item_per_block)
+make_random_block(total_items, target_items = total_items, block_size)
 }
 \arguments{
-\item{total_items}{Integer value. Determines the total number of items we sample from.}
+\item{total_items}{Integer. The total number of items available in the item pool.}
 
-\item{target_items}{Integer value. Determines the number of items to use from
-\code{total_items} to build item blocks.
-Default to be equal to \code{total_items}. Should be no more than \code{total_items}.}
+\item{target_items}{Integer. The number of items to sample from \code{total_items}
+to build the blocks. Defaults to \code{total_items}. Must be \eqn{\le} \code{total_items}.}
 
-\item{item_per_block}{Integer value. Determines the number of items in each item block.
-Should be no less than 2.}
+\item{block_size}{Integer. The number of items in each block (e.g., 2 for pairs,
+3 for triplets). Must be \eqn{\ge 2}.}
 }
 \value{
-A matrix of integers indicating the item numbers, where the number of rows
-equals \code{target_items} divided by \code{item_per_block}, rounded up,
-and number of columns equals \code{item_per_block}.
+A matrix of integers indicating the item IDs. The number of rows equals
+\code{ceiling(target_items / block_size)}, and the number of columns
+equals \code{block_size}.
 }
 \description{
-Returns a matrix of randomly paired blocks
-where each row represents a block.
+Generates a matrix of randomly paired blocks, where each row
+represents a block of items. This serves as a fast, unstructured initial
+solution for forced-choice test assembly algorithms.
 }
 \details{
-Given the total number of items to pair from, number of items to build
-paired blocks and number of items in each block,
-\code{make_random_block} produces a matrix randomly paired blocks
-where each row represents a block.
+Given the total number of items in the pool, this function randomly samples
+\code{target_items} and formats them into a block matrix.
 
-It can also accommodate cases when \code{target_items}
-is not a multiple of \code{item_per_block}.
-
-Can be used as initial solution for other functions in this package.
-}
-\note{
-If \code{target_items} is not a multiple of \code{item_per_block},
-       the item set produced by \code{target_items} will be looped
-       until number of sampled items becomes a multiple of \code{item_per_block}.
+If \code{target_items} is not a multiple of \code{block_size}, the function will
+randomly draw additional items from the sampled pool to fill the incomplete final block,
+ensuring the matrix structure is strictly maintained.
 }
 \examples{
-# Try out cases where you make target_items the default.
-make_random_block(60, item_per_block = 3)
+# Use all 60 items to build 20 blocks of 3
+make_random_block(total_items = 60, block_size = 3)
 
-# You can also set your own values of target_items.
-make_random_block(60, 45, item_per_block = 3)
+# Sample 45 items from a pool of 60 to build 15 blocks of 3
+make_random_block(total_items = 60, target_items = 45, block_size = 3)
 
-# Also see what happens if target_items is not a multiple of item_per_block.
-make_random_block(60, 50, item_per_block = 3)
+# Handle cases where target_items is not a multiple of block_size
+# (Will randomly reuse 1 item to fill the last triplet)
+make_random_block(total_items = 60, target_items = 50, block_size = 3)
 
-}
-\author{
-Mengtong Li
 }
